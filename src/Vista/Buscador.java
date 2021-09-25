@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 public class Buscador extends javax.swing.JFrame {
 
     File[] listaFiles;
-    
+
     /**
      * Creates new form Buscador
      */
@@ -167,9 +167,9 @@ public class Buscador extends javax.swing.JFrame {
 
     private void etExtensionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_etExtensionKeyPressed
         DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
-        if(modelo.getRowCount()>0){
+        if (modelo.getRowCount() > 0) {
             etExtension.setEditable(true);
-        }else{
+        } else {
             etExtension.setEditable(false);
         }
         
@@ -205,7 +205,7 @@ public class Buscador extends javax.swing.JFrame {
                 new Buscador().setVisible(true);
             }
         });
-        
+
     }
 
     public void rellenarTabla(File f) {
@@ -248,14 +248,14 @@ public class Buscador extends javax.swing.JFrame {
             } else {
                 fod = "F";
             }
-            modelo.addRow(new Object[]{f.getName(), fe, "" + f.getUsableSpace(), fod});
+            modelo.addRow(new Object[]{f.getName(), fe, "" + f.length(), fod});
         } catch (NullPointerException e) {
             System.out.println("Ha ocurrido un error: " + e.getMessage());
         } catch (SecurityException e) {
             System.out.println("Ha ocurrido un error: " + e.getMessage());
         }
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla;
     private javax.swing.JButton bEscogerArchivo;
