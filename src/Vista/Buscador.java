@@ -5,6 +5,7 @@
  */
 package Vista;
 
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -18,8 +19,6 @@ import javax.swing.table.DefaultTableModel;
  * @author PC
  */
 public class Buscador extends javax.swing.JFrame {
-
-    File[] listaFiles;
 
     /**
      * Creates new form Buscador
@@ -44,6 +43,7 @@ public class Buscador extends javax.swing.JFrame {
         etExtension = new javax.swing.JFormattedTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         Tabla = new javax.swing.JTable();
+        bLimpiar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Explorador básico");
@@ -66,9 +66,19 @@ public class Buscador extends javax.swing.JFrame {
         jLabel2.setText("Extensión");
 
         etExtension.setEditable(false);
+        etExtension.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                etExtensionInputMethodTextChanged(evt);
+            }
+        });
         etExtension.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 etExtensionKeyPressed(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                etExtensionKeyTyped(evt);
             }
         });
 
@@ -106,6 +116,17 @@ public class Buscador extends javax.swing.JFrame {
             Tabla.getColumnModel().getColumn(3).setResizable(false);
         }
 
+        bLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/limpiar.png"))); // NOI18N
+        bLimpiar.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        bLimpiar.setEnabled(false);
+        bLimpiar.setName("bFileChoser"); // NOI18N
+        bLimpiar.setRolloverEnabled(false);
+        bLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bLimpiarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,14 +141,17 @@ public class Buscador extends javax.swing.JFrame {
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(41, 41, 41)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(etExtension, javax.swing.GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
                                     .addComponent(etPath))
                                 .addGap(75, 75, 75)
-                                .addComponent(bEscogerArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(bEscogerArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(15, 15, 15)))))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -141,7 +165,10 @@ public class Buscador extends javax.swing.JFrame {
                         .addComponent(etPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(71, 71, 71)
-                        .addComponent(bEscogerArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(bEscogerArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(bLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(34, 34, 34)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -163,17 +190,123 @@ public class Buscador extends javax.swing.JFrame {
             etPath.setText(f.getAbsolutePath());
             rellenarTabla(f);
         }
+        etExtension.setEditable(true);
+        bLimpiar.setEnabled(true);
     }//GEN-LAST:event_bEscogerArchivoActionPerformed
 
     private void etExtensionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_etExtensionKeyPressed
-        DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
-        if (modelo.getRowCount() > 0) {
-            etExtension.setEditable(true);
+        Character letra = evt.getKeyChar();
+        if (Character.isLetter(letra) || Character.isDigit(letra) || (evt.getKeyChar() == KeyEvent.VK_SPACE) || (evt.getKeyChar() == KeyEvent.VK_BACK_SPACE) || (evt.getKeyChar() == KeyEvent.VK_SHIFT)) {
+            File[] listaFiles;
+            if (evt.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                if (etExtension.getText().length() == 1) {
+                    File f = new File(etPath.getText());
+                    rellenarTabla(f);
+                } else {
+                    if (etExtension.getText().length() != 0) {
+                        String texto = etExtension.getText().substring(0, etExtension.getText().length() - 1);
+                        DefaultTableModel model = (DefaultTableModel) Tabla.getModel();
+                        int filas = Tabla.getRowCount();
+                        for (int i = 0; i < filas; i++) {
+                            model.removeRow(0);
+                        }
+                        DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
+                        File f = new File(etPath.getText());
+                        if (f.isDirectory()) {
+                            listaFiles = f.listFiles();
+                            for (File f1 : listaFiles) {
+                                String extension = "";
+                                int i = f1.getName().lastIndexOf('.');
+                                if (i > 0) {
+                                    extension = f1.getName().substring(i + 1);
+                                }
+                                if (extension.startsWith(texto)) {
+                                    anadirFila(f1);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (evt.getKeyCode() == KeyEvent.VK_SPACE && etExtension.getText().length() == 0) {
+                    String texto = etExtension.getText() + evt.getKeyChar();
+                    DefaultTableModel model = (DefaultTableModel) Tabla.getModel();
+                    int filas = Tabla.getRowCount();
+                    for (int i = 0; i < filas; i++) {
+                        model.removeRow(0);
+                    }
+                    if (!texto.equals(" ")) {
+                        DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
+                        File f = new File(etPath.getText());
+                        if (f.isDirectory()) {
+                            listaFiles = f.listFiles();
+                            for (File f1 : listaFiles) {
+                                String extension = "";
+                                int i = f1.getName().lastIndexOf('.');
+                                if (i > 0) {
+                                    extension = f1.getName().substring(i + 1);
+                                }
+                                if (extension.startsWith(texto)) {
+                                    anadirFila(f1);
+                                }
+                            }
+                        }
+                    } else {
+                        DefaultTableModel modelo1 = (DefaultTableModel) Tabla.getModel();
+                        int filass = Tabla.getRowCount();
+                        for (int i = 0; i < filas; i++) {
+                            modelo1.removeRow(0);
+                        }
+                    }
+                } else {
+                    String texto = etExtension.getText() + evt.getKeyChar();
+
+                    DefaultTableModel model = (DefaultTableModel) Tabla.getModel();
+                    int filas = Tabla.getRowCount();
+                    for (int i = 0; i < filas; i++) {
+                        model.removeRow(0);
+                    }
+                    if (!texto.equals("")) {
+                        DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
+                        File f = new File(etPath.getText());
+                        if (f.isDirectory()) {
+                            listaFiles = f.listFiles();
+                            for (File f1 : listaFiles) {
+                                String extension = "";
+                                int i = f1.getName().lastIndexOf('.');
+                                if (i > 0) {
+                                    extension = f1.getName().substring(i + 1);
+                                }
+                                if (extension.startsWith(texto)) {
+                                    anadirFila(f1);
+                                }
+                            }
+                        }
+                    } else {
+                        File f = new File(etPath.getText());
+                        rellenarTabla(f);
+                    }
+                }
+            }
         } else {
-            etExtension.setEditable(false);
+            getToolkit().beep();
         }
-        
     }//GEN-LAST:event_etExtensionKeyPressed
+
+    private void bLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLimpiarActionPerformed
+        DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
+        modelo.setRowCount(0);
+        bLimpiar.setEnabled(false);
+        etExtension.setEditable(false);
+        etPath.setText("");
+        etExtension.setText("");
+    }//GEN-LAST:event_bLimpiarActionPerformed
+
+    private void etExtensionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_etExtensionKeyTyped
+    }//GEN-LAST:event_etExtensionKeyTyped
+
+    private void etExtensionInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_etExtensionInputMethodTextChanged
+    }//GEN-LAST:event_etExtensionInputMethodTextChanged
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -209,6 +342,7 @@ public class Buscador extends javax.swing.JFrame {
     }
 
     public void rellenarTabla(File f) {
+        File[] listaFiles;
         try {
             DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
             int filas = Tabla.getRowCount();
@@ -256,9 +390,71 @@ public class Buscador extends javax.swing.JFrame {
         }
     }
 
+    public void filtroExtension(java.awt.event.KeyEvent evt) {
+        File[] listaFiles;
+        if (evt.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+            if (etExtension.getText().length() == 1) {
+                File f = new File(etPath.getText());
+                rellenarTabla(f);
+            } else {
+                if (etExtension.getText().trim().length() != 0) {
+                    String texto = etExtension.getText().trim().substring(0, etExtension.getText().trim().length() - 1);
+                    DefaultTableModel model = (DefaultTableModel) Tabla.getModel();
+                    int filas = Tabla.getRowCount();
+                    for (int i = 0; i < filas; i++) {
+                        model.removeRow(0);
+                    }
+                    DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
+                    File f = new File(etPath.getText());
+                    if (f.isDirectory()) {
+                        listaFiles = f.listFiles();
+                        for (File f1 : listaFiles) {
+                            String extension = "";
+                            int i = f1.getName().lastIndexOf('.');
+                            if (i > 0) {
+                                extension = f1.getName().substring(i + 1);
+                            }
+                            if (extension.startsWith(texto)) {
+                                anadirFila(f1);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            String texto = etExtension.getText().trim() + evt.getKeyChar();
+            DefaultTableModel model = (DefaultTableModel) Tabla.getModel();
+            int filas = Tabla.getRowCount();
+            for (int i = 0; i < filas; i++) {
+                model.removeRow(0);
+            }
+            if (!texto.trim().equals("")) {
+                DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
+                File f = new File(etPath.getText());
+                if (f.isDirectory()) {
+                    listaFiles = f.listFiles();
+                    for (File f1 : listaFiles) {
+                        String extension = "";
+                        int i = f1.getName().lastIndexOf('.');
+                        if (i > 0) {
+                            extension = f1.getName().substring(i + 1);
+                        }
+                        if (extension.startsWith(texto)) {
+                            anadirFila(f1);
+                        }
+                    }
+                }
+            } else {
+                File f = new File(etPath.getText());
+                rellenarTabla(f);
+            }
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla;
     private javax.swing.JButton bEscogerArchivo;
+    private javax.swing.JButton bLimpiar;
     private javax.swing.JFormattedTextField etExtension;
     private javax.swing.JTextField etPath;
     private javax.swing.JLabel jLabel1;
