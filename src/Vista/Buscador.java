@@ -235,7 +235,7 @@ public class Buscador extends javax.swing.JFrame {
                     for (int i = 0; i < filas; i++) {
                         model.removeRow(0);
                     }
-                    if (!texto.equals(" ")) {
+                    if (!texto.equals(" ")&&!texto.equals("")) {
                         DefaultTableModel modelo = (DefaultTableModel) Tabla.getModel();
                         File f = new File(etPath.getText());
                         if (f.isDirectory()) {
