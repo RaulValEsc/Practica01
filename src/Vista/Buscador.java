@@ -189,9 +189,9 @@ public class Buscador extends javax.swing.JFrame {
             File f = fc.getSelectedFile();
             etPath.setText(f.getAbsolutePath());
             rellenarTabla(f);
+            etExtension.setEditable(true);
+            bLimpiar.setEnabled(true);
         }
-        etExtension.setEditable(true);
-        bLimpiar.setEnabled(true);
     }//GEN-LAST:event_bEscogerArchivoActionPerformed
 
     private void etExtensionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_etExtensionKeyPressed
